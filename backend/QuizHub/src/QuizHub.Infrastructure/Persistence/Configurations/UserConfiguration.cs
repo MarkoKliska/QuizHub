@@ -4,7 +4,7 @@ using QuizHub.Domain.Entities;
 
 namespace QuizHub.Infrastructure.Persistence.Configurations;
 
-internal class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
