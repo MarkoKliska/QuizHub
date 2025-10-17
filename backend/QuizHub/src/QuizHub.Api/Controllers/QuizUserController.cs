@@ -5,6 +5,8 @@ using QuizHub.Application.DTOs.Quiz.GetFilteredQuizzes;
 using QuizHub.Application.DTOs.QuizAttempt.StartQuizAttempt;
 using QuizHub.Application.DTOs.QuizAttempt.SubmitQuizAttempt;
 using QuizHub.Application.Features.Quiz.GetFilteredQuizzes;
+using QuizHub.Application.Features.QuizAttempt.GetMyResults;
+using QuizHub.Application.Features.QuizAttempt.GetQuizAttemptDetails;
 using QuizHub.Application.Features.QuizAttempt.StartQuizAttempt;
 using QuizHub.Application.Features.QuizAttempt.SubmitQuizAttempt;
 using System.IdentityModel.Tokens.Jwt;
@@ -53,6 +55,24 @@ public class QuizController(
         };
 
         var result = await mediator.Send(new GetFilteredQuizzesQuery(request), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
+    }
+
+    [HttpGet("attempts/user")]
+    [Authorize]
+    public async Task<IActionResult> GetUserQuizAttempts(CancellationToken ct)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await mediator.Send(new GetMyResultsQuery(userId), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
+    }
+
+    [HttpGet("attempts/{attemptId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetQuizAttemptDetails(Guid attemptId, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetQuizAttemptDetailsQuery(attemptId), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 }
