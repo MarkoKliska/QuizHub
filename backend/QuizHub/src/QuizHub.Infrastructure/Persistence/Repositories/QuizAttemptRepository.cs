@@ -12,7 +12,6 @@ public class QuizAttemptRepository(QuizHubDbContext context) : IQuizAttemptRepos
     {
         await context.QuizAttempts.AddAsync(attempt, ct);
     }
-
     public async Task<IEnumerable<QuizAttempt>> GetAllByQuizIdAsync(Guid quizId, CancellationToken ct)
     {
         return await context.QuizAttempts
@@ -23,7 +22,6 @@ public class QuizAttemptRepository(QuizHubDbContext context) : IQuizAttemptRepos
             .ThenBy(a => a.EndTime)
             .ToListAsync(ct);
     }
-
     public async Task<IEnumerable<QuizAttempt>> GetAllAsync(CancellationToken ct)
     {
         return await context.QuizAttempts
@@ -34,7 +32,6 @@ public class QuizAttemptRepository(QuizHubDbContext context) : IQuizAttemptRepos
             .ThenBy(a => a.EndTime)
             .ToListAsync(ct);
     }
-
     public async Task<IEnumerable<QuizAttempt>> GetByUserIdAsync(Guid userId, CancellationToken ct)
     {
         return await context.QuizAttempts
@@ -42,5 +39,16 @@ public class QuizAttemptRepository(QuizHubDbContext context) : IQuizAttemptRepos
             .Where(a => a.UserId == userId)
             .OrderByDescending(a => a.EndTime)
             .ToListAsync(ct);
+    }
+    public async Task<QuizAttempt?> GetByIdAsync(Guid id, CancellationToken ct)
+    {
+        return await context.QuizAttempts
+            .Include(a => a.User)
+            .Include(a => a.Quiz)
+            .FirstOrDefaultAsync(a => a.Id == id, ct);
+    }
+    public async Task UpdateAsync(QuizAttempt attempt, CancellationToken ct)
+    {
+        context.QuizAttempts.Update(attempt);
     }
 }
