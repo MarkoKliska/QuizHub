@@ -34,8 +34,8 @@ public sealed class CreateQuestionCommandHandler(
 
         if (questionType == QuestionType.SingleChoice || questionType == QuestionType.MultipleChoice)
         {
-            if (req.Options.Count < 2)
-                return Result<CreateQuestionResponseDto>.Failure("Choice questions must have at least 2 options.");
+            if (req.Options.Count < 4)
+                return Result<CreateQuestionResponseDto>.Failure("Choice questions must have at least 4 options.");
             if (questionType == QuestionType.SingleChoice && req.Options.Count(o => o.IsCorrect) != 1)
                 return Result<CreateQuestionResponseDto>.Failure("Single-choice questions must have exactly one correct option.");
             if (questionType == QuestionType.MultipleChoice && !req.Options.Any(o => o.IsCorrect))

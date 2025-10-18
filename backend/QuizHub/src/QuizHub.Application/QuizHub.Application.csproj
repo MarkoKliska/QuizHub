@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Category\DeleteCategory\" />
+  </ItemGroup>
+
 </Project>
