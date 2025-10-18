@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizHub.Infrastructure.Persistence.Contexts;
@@ -11,9 +12,11 @@ using QuizHub.Infrastructure.Persistence.Contexts;
 namespace QuizHub.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QuizHubDbContext))]
-    partial class QuizHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016153305_InitializeQuizzTables")]
+    partial class InitializeQuizzTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
