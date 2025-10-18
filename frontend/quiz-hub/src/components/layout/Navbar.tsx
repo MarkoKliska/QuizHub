@@ -6,7 +6,7 @@ const Navbar: React.FC = () => {
   const authContext = useContext(AuthContext);
 
   return (
-    <nav className="bg-primary text-white p-4 flex justify-between items-center">
+    <nav className="bg-accent text-white p-4 flex justify-between items-center">
       <Link to="/" className="text-xl font-semibold">
         QuizHub
       </Link>

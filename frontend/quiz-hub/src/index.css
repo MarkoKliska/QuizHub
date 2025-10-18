@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 :root {
-  --primary: #B77466;
-  --secondary: #FFE1AF;
-  --tertiary: #E2B59A;
-  --accent: #957C62;
+  --primary: #D2C1B6;
+  --secondary: #456882;
+  --tertiary: #234C6A;
+  --accent: #1B3C53;
 }
 
 body {
