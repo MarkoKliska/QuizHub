@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using QuizHub.Application.DTOs.Quiz.GetFilteredQuizzes;
 using QuizHub.Application.DTOs.QuizAttempt.StartQuizAttempt;
 using QuizHub.Application.DTOs.QuizAttempt.SubmitQuizAttempt;
+using QuizHub.Application.Features.Category.GetAllCategories;
+using QuizHub.Application.Features.Question.GetQuestionByQuizId;
+using QuizHub.Application.Features.Quiz.GetAllQuizzes;
 using QuizHub.Application.Features.Quiz.GetFilteredQuizzes;
 using QuizHub.Application.Features.QuizAttempt.GetMyResults;
 using QuizHub.Application.Features.QuizAttempt.GetQuizAttemptDetails;
@@ -20,6 +23,13 @@ public class QuizController(
     IMediator mediator
 ) : ControllerBase
 {
+    [HttpGet("quizzes/{quizId}/questions")]
+    public async Task<IActionResult> GetQuestionsByQuizId(Guid quizId, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetQuestionsByQuizIdQuery(quizId), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
+    }
+
     [HttpPost("attempts")]
     [Authorize]
     public async Task<IActionResult> StartQuizAttempt([FromBody] StartQuizAttemptRequestDto request, CancellationToken ct)
@@ -73,6 +83,14 @@ public class QuizController(
     public async Task<IActionResult> GetQuizAttemptDetails(Guid attemptId, CancellationToken ct)
     {
         var result = await mediator.Send(new GetQuizAttemptDetailsQuery(attemptId), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
+    }
+
+    [HttpGet("categories")]
+    [Authorize]
+    public async Task<IActionResult> GetAllCategories(CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllCategoriesQuery(), ct);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 }

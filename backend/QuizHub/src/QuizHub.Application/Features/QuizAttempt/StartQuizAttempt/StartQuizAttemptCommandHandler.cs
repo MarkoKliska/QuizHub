@@ -21,8 +21,16 @@ public sealed class StartQuizAttemptCommandHandler(
             return Result<StartQuizAttemptResponseDto>.Failure("Quiz not found.");
 
         var existingAttempt = await quizAttemptRepository.GetByUserIdAsync(command.UserId, ct);
-        if (existingAttempt.Any(a => a.QuizId == req.QuizId && !a.IsCompleted))
-            return Result<StartQuizAttemptResponseDto>.Failure("User already has an active attempt for this quiz.");
+        var activeAttempt = existingAttempt.FirstOrDefault(a => a.QuizId == req.QuizId && !a.IsCompleted);
+        if (activeAttempt != null)
+        {
+            activeAttempt.SetIsCompleted();
+            activeAttempt.SetEndTime();
+            await quizAttemptRepository.UpdateAsync(activeAttempt, ct);
+            await uow.SaveChangesAsync(ct);
+        }
+        //if (existingAttempt.Any(a => a.QuizId == req.QuizId && !a.IsCompleted))
+        //    return Result<StartQuizAttemptResponseDto>.Failure("User already has an active attempt for this quiz.");
 
         var attempt = new Domain.Entities.QuizAttempt(command.UserId, req.QuizId);
 

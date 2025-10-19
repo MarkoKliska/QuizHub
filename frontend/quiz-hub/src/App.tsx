@@ -9,6 +9,9 @@ import Footer from './components/layout/Footer';
 import Home from './pages/Home/Home';
 import Login from './pages/User/Login';
 import Register from './pages/User/Register';
+import Quiz from './pages/Quiz/Quiz';
+import Results from './pages/Results/Results';
+import MyResults from './pages/MyResults/MyResults';
 
 function App() {
   return (
@@ -24,6 +27,32 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quiz/:quizId"
+                element={
+                  <ProtectedRoute>
+                    <Quiz />
+                  </ProtectedRoute>
+                }
+              />
+              {/* IZMENJENO: Dodaj :attemptId parametar */}
+              <Route
+                path="/results/:attemptId"
+                element={
+                  <ProtectedRoute>
+                    <Results />
+                  </ProtectedRoute>
+                }
+              />
+              {/* NOVO: Dodaj rutu za sve rezultate */}
+              <Route
+                path="/my-results"
+                element={
+                  <ProtectedRoute>
+                    <MyResults />
                   </ProtectedRoute>
                 }
               />
