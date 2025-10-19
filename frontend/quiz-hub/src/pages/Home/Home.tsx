@@ -56,12 +56,20 @@ const Home: React.FC = () => {
     <div className="bg-primary min-h-screen p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-accent">Available Quizzes</h2>
-        <Button 
-          onClick={() => navigate('/my-results')}
-          className="bg-purple-600 hover:bg-purple-700"
-        >
-        My Results
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => navigate('/leaderboard')}
+            className="bg-yellow-600 hover:bg-yellow-700"
+          >
+             Leaderboard
+          </Button>
+          <Button 
+            onClick={() => navigate('/my-results')}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            My Results
+          </Button>
+        </div>
       </div>
 
       {error && <p className="text-red-500 mb-4 text-center">{error}</p>}

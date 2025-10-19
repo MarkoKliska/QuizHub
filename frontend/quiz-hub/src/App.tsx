@@ -11,6 +11,7 @@ import Register from './pages/User/Register';
 import Quiz from './pages/Quiz/Quiz';
 import Results from './pages/Results/Results';
 import MyResults from './pages/MyResults/MyResults';
+import Leaderboard from './pages/Leaderboard/Leaderboard';
 
 function App() {
   return (
@@ -50,6 +51,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyResults />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/leaderboard"
+                element={
+                  <ProtectedRoute>
+                    <Leaderboard />
                   </ProtectedRoute>
                 }
               />
