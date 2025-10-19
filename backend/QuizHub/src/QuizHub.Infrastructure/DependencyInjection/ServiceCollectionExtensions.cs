@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IOptionRepository, OptionRepository>();
         services.AddScoped<IQuizAttemptRepository, QuizAttemptRepository>();
+        services.AddScoped<IQuizAttemptAnswerRepository, QuizAttemptAnswerRepository>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

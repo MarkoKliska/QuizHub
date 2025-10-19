@@ -1,7 +1,5 @@
-// src/pages/Home/Home.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService';
 import { Quiz } from '../../models/Quiz';
 import { Category } from '../../models/Category';
 import Input from '../../components/common/Input';
@@ -56,7 +54,16 @@ const Home: React.FC = () => {
 
   return (
     <div className="bg-primary min-h-screen p-6">
-      <h2 className="text-2xl font-bold text-accent mb-6 text-center">Available Quizzes</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-accent">Available Quizzes</h2>
+        <Button 
+          onClick={() => navigate('/my-results')}
+          className="bg-purple-600 hover:bg-purple-700"
+        >
+        My Results
+        </Button>
+      </div>
+
       {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
       <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center">

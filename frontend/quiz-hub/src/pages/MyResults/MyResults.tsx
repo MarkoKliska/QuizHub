@@ -1,4 +1,3 @@
-// src/pages/MyResults/MyResults.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
@@ -85,7 +84,7 @@ const MyResults: React.FC = () => {
 
         {attempts.length === 0 ? (
           <div className="bg-white p-12 rounded-lg shadow-lg text-center">
-            <div className="text-6xl mb-4">📝</div>
+            <div className="text-6xl mb-4"></div>
             <h3 className="text-2xl font-bold text-accent mb-2">No Quiz Attempts Yet</h3>
             <p className="text-gray-600 mb-6">
               Start taking quizzes to see your results here!
@@ -96,7 +95,6 @@ const MyResults: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <div className="text-4xl font-bold text-accent">{attempts.length}</div>
@@ -122,7 +120,6 @@ const MyResults: React.FC = () => {
               </div>
             </div>
 
-            {/* Attempts List */}
             <div className="space-y-4">
               {attempts.map((attempt) => (
                 <div
@@ -136,10 +133,10 @@ const MyResults: React.FC = () => {
                       </h3>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <span>
-                          📅 {new Date(attempt.completedAt).toLocaleDateString()} at{' '}
+                          {new Date(attempt.completedAt).toLocaleDateString()} at{' '}
                           {new Date(attempt.completedAt).toLocaleTimeString()}
                         </span>
-                        <span>⏱️ Duration: {formatDuration(attempt.durationSeconds)}</span>
+                        <span> Duration: {formatDuration(attempt.durationSeconds)}</span>
                       </div>
                     </div>
 
@@ -162,7 +159,6 @@ const MyResults: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Progress Bar */}
                   <div className="mt-4">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div

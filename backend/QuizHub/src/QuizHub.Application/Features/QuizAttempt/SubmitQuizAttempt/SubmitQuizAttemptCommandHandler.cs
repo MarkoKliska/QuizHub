@@ -9,6 +9,7 @@ namespace QuizHub.Application.Features.QuizAttempt.SubmitQuizAttempt;
 
 public sealed class SubmitQuizAttemptCommandHandler(
     IQuizAttemptRepository quizAttemptRepository,
+    IQuizAttemptAnswerRepository quizAttemptAnswerRepository,
     IQuizRepository quizRepository,
     IQuestionRepository questionRepository,
     IOptionRepository optionRepository,
@@ -40,6 +41,7 @@ public sealed class SubmitQuizAttemptCommandHandler(
 
         int totalPoints = questions.Sum(q => q.Points);
         int score = 0;
+        var attemptAnswers = new List<QuizAttemptAnswer>();
 
         foreach (var answer in req.Answers)
         {
@@ -48,6 +50,8 @@ public sealed class SubmitQuizAttemptCommandHandler(
                 continue;
 
             bool isCorrect = false;
+            int pointsAwarded = 0;
+
             switch (question.Type)
             {
                 case QuestionType.SingleChoice:
@@ -58,17 +62,48 @@ public sealed class SubmitQuizAttemptCommandHandler(
 
                     if (question.Type == QuestionType.SingleChoice)
                     {
-                        isCorrect = selectedOptionIds.Count == 1 && correctOptionIds.Count == 1 && selectedOptionIds[0] == correctOptionIds[0];
+                        isCorrect = selectedOptionIds.Count == 1 &&
+                                    correctOptionIds.Count == 1 &&
+                                    selectedOptionIds[0] == correctOptionIds[0];
                     }
                     else
                     {
-                        isCorrect = selectedOptionIds.Count == correctOptionIds.Count && selectedOptionIds.All(id => correctOptionIds.Contains(id));
+                        isCorrect = selectedOptionIds.Count == correctOptionIds.Count &&
+                                    selectedOptionIds.All(id => correctOptionIds.Contains(id));
                     }
+
+                    if (isCorrect)
+                        pointsAwarded = question.Points;
+
+                    attemptAnswers.Add(new QuizAttemptAnswer(
+                        attempt.Id,
+                        question.Id,
+                        selectedOptionIds,
+                        null,
+                        isCorrect,
+                        pointsAwarded
+                    ));
                     break;
 
                 case QuestionType.TrueFalse:
                 case QuestionType.FillInBlank:
-                    isCorrect = string.Equals(answer.TextAnswer?.Trim(), question.CorrectAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
+                    isCorrect = string.Equals(
+                        answer.TextAnswer?.Trim(),
+                        question.CorrectAnswer?.Trim(),
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+                    if (isCorrect)
+                        pointsAwarded = question.Points;
+
+                    attemptAnswers.Add(new QuizAttemptAnswer(
+                        attempt.Id,
+                        question.Id,
+                        null,
+                        answer.TextAnswer,
+                        isCorrect,
+                        pointsAwarded
+                    ));
                     break;
             }
 
@@ -81,6 +116,7 @@ public sealed class SubmitQuizAttemptCommandHandler(
         attempt.Complete(score, percentage);
 
         await quizAttemptRepository.UpdateAsync(attempt, ct);
+        await quizAttemptAnswerRepository.AddRangeAsync(attemptAnswers, ct);
         await uow.SaveChangesAsync(ct);
 
         return Result<SubmitQuizAttemptResponseDto>.Success(new SubmitQuizAttemptResponseDto

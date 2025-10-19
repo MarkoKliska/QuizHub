@@ -1,15 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'https://localhost:7034/api';
+import axiosInstance from '../utils/axiosConfig';
 
 const quizService = {
   getQuizzes: async (filters: { categoryId?: string; difficulty?: string; search?: string }) => {
-    const response = await axios.get(`${API_URL}/quiz`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      params: filters,
-    });
+    const response = await axiosInstance.get('/quiz', { params: filters });
     return response.data;
   },
 };

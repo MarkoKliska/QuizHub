@@ -1,15 +1,8 @@
-// src/services/authService.ts
-import axios from 'axios';
-
-const API_URL = 'https://localhost:7034/api';
+import axiosInstance from '../utils/axiosConfig';
 
 const categoryService = {
   getCategories: async () => {
-    const response = await axios.get(`${API_URL}/quiz/categories`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
+    const response = await axiosInstance.get('/quiz/categories');
     return response.data;
   },
 };

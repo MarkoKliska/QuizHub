@@ -1,4 +1,3 @@
-// src/pages/Quiz/Quiz.tsx
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Question } from '../../models/Question';
@@ -37,7 +36,6 @@ const Quiz: React.FC = () => {
         const questionsData = await questionService.getQuestionsByQuizId(quizId);
         console.log('Questions data:', questionsData);
         
-        // Proveri da li postoje pitanja
         if (!questionsData || questionsData.length === 0) {
           setError('This quiz has no questions yet. Please try another quiz.');
           return;
@@ -50,7 +48,6 @@ const Quiz: React.FC = () => {
           textAnswer: '' 
         })));
 
-        // Fetch quiz details for timeLimit
         const quizzes = await quizService.getQuizzes({});
         const quiz = quizzes.find((q: any) => q.id === quizId);
         if (!quiz) {
@@ -66,7 +63,6 @@ const Quiz: React.FC = () => {
     };
     startQuiz();
 
-    // Cleanup na unmount
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -96,7 +92,6 @@ const Quiz: React.FC = () => {
     };
   }, [timeLeft, isSubmitting]);
 
-  // Automatsko slanje kada istekne vreme
   useEffect(() => {
     if (timeLeft === 0 && !hasSubmittedRef.current && !isSubmitting) {
       console.log('Time expired - auto submitting quiz');
@@ -127,18 +122,15 @@ const Quiz: React.FC = () => {
     hasSubmittedRef.current = true;
     setIsSubmitting(true);
 
-    // Zaustavi timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
 
     try {
-      // Očisti odgovore - ukloni prazne selectedOptionIds i prazne textAnswers
       const cleanedAnswers = answers.map((ans) => {
         const question = questions.find(q => q.id === ans.questionId);
         if (!question) return ans;
 
-        // Za TrueFalse i FillInBlank koristi textAnswer
         if (question.type === 'FillInBlank') {
           return {
             questionId: ans.questionId,
@@ -146,17 +138,14 @@ const Quiz: React.FC = () => {
             selectedOptionIds: undefined
           };
         } 
-        // Za TrueFalse - proveri da li ima opcije ili je text input
         else if (question.type === 'TrueFalse') {
           if (question.options && question.options.length > 0) {
-            // Ima opcije - koristi selectedOptionIds
             return {
               questionId: ans.questionId,
               selectedOptionIds: ans.selectedOptionIds?.length ? ans.selectedOptionIds : undefined,
               textAnswer: undefined
             };
           } else {
-            // Nema opcije - koristi textAnswer
             return {
               questionId: ans.questionId,
               textAnswer: ans.textAnswer || undefined,
@@ -164,7 +153,6 @@ const Quiz: React.FC = () => {
             };
           }
         } 
-        // Za SingleChoice i MultipleChoice koristi selectedOptionIds
         else {
           return {
             questionId: ans.questionId,
@@ -178,7 +166,6 @@ const Quiz: React.FC = () => {
       const response = await quizAttemptService.submitQuizAttempt(attempt.id, cleanedAnswers);
       console.log('Submission response:', response);
       
-      // Navigacija na rezultate sa attemptId
       navigate(`/results/${attempt.id}`);
     } catch (err: any) {
       console.error('Error submitting quiz:', err.response?.data || err.message);
@@ -225,15 +212,13 @@ const Quiz: React.FC = () => {
           </div>
         )}
 
-        {/* Timer */}
         <div className={`mb-6 text-center text-2xl font-semibold ${getTimerColor()}`}>
-          ⏱️ Time Left: {timeLeft !== null ? formatTime(timeLeft) : 'Loading...'}
+          Time Left: {timeLeft !== null ? formatTime(timeLeft) : 'Loading...'}
           {timeLeft !== null && timeLeft <= 60 && (
             <div className="text-sm mt-1">Hurry up! Time is running out!</div>
           )}
         </div>
 
-        {/* Progress bar */}
         <div className="mb-6">
           <div className="flex justify-between text-sm text-accent mb-2">
             <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
@@ -247,7 +232,6 @@ const Quiz: React.FC = () => {
           </div>
         </div>
 
-        {/* Question card */}
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
@@ -261,7 +245,6 @@ const Quiz: React.FC = () => {
             <h3 className="text-xl font-semibold text-accent">{currentQuestion.text}</h3>
           </div>
 
-          {/* Answer options */}
           {currentQuestion.type === 'SingleChoice' ? (
             <div className="space-y-3">
               {currentQuestion.options.map((option) => (
@@ -289,7 +272,6 @@ const Quiz: React.FC = () => {
           ) : currentQuestion.type === 'TrueFalse' ? (
             <div className="space-y-3">
               {currentQuestion.options && currentQuestion.options.length > 0 ? (
-                // Ako postoje opcije, prikaži ih kao radio buttons
                 currentQuestion.options.map((option) => (
                   <label 
                     key={option.id} 
@@ -312,7 +294,6 @@ const Quiz: React.FC = () => {
                   </label>
                 ))
               ) : (
-                // Ako nema opcija, prikaži text input za True/False
                 <div>
                   <p className="text-sm text-gray-600 mb-3">Enter "True" or "False":</p>
                   <Input
@@ -368,7 +349,6 @@ const Quiz: React.FC = () => {
             </div>
           )}
 
-          {/* Navigation buttons */}
           <div className="flex justify-between mt-8 pt-6 border-t">
             <Button
               onClick={() => setCurrentQuestionIndex((prev) => Math.max(0, prev - 1))}
@@ -394,7 +374,6 @@ const Quiz: React.FC = () => {
           </div>
         </div>
 
-        {/* Answer indicator */}
         <div className="mt-6 flex justify-center flex-wrap gap-2">
           {questions.map((q, index) => {
             const answer = answers[index];

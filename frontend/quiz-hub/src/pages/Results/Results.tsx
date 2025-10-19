@@ -1,4 +1,3 @@
-// src/pages/Results/Results.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
@@ -77,32 +76,20 @@ const Results: React.FC = () => {
   return (
     <div className="bg-primary min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="bg-white p-8 rounded-lg shadow-lg mb-6">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-accent mb-2">{details.quizName}</h2>
             <p className="text-gray-600">Quiz Results</p>
           </div>
 
-          {/* Score Circle */}
           <div className="flex justify-center my-8">
             <div className="relative">
               <svg className="transform -rotate-90 w-48 h-48">
+                <circle cx="96" cy="96" r="80" stroke="#E5E7EB" strokeWidth="12" fill="none" />
                 <circle
-                  cx="96"
-                  cy="96"
-                  r="80"
-                  stroke="#E5E7EB"
-                  strokeWidth="12"
-                  fill="none"
-                />
-                <circle
-                  cx="96"
-                  cy="96"
-                  r="80"
+                  cx="96" cy="96" r="80"
                   stroke={details.percentage >= 70 ? '#10B981' : details.percentage >= 50 ? '#F59E0B' : '#EF4444'}
-                  strokeWidth="12"
-                  fill="none"
+                  strokeWidth="12" fill="none"
                   strokeDasharray={`${2 * Math.PI * 80}`}
                   strokeDashoffset={`${2 * Math.PI * 80 * (1 - details.percentage / 100)}`}
                   strokeLinecap="round"
@@ -113,9 +100,6 @@ const Results: React.FC = () => {
                 <div className={`text-5xl font-bold ${gradeInfo.color}`}>
                   {details.percentage.toFixed(1)}%
                 </div>
-                <div className={`text-2xl font-bold ${gradeInfo.color} mt-2`}>
-                  {gradeInfo.grade}
-                </div>
               </div>
             </div>
           </div>
@@ -124,7 +108,6 @@ const Results: React.FC = () => {
             {gradeInfo.message}
           </p>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-gray-50 p-4 rounded-lg text-center">
               <div className="text-3xl font-bold text-accent">{totalQuestions}</div>
@@ -144,7 +127,6 @@ const Results: React.FC = () => {
             </div>
           </div>
 
-          {/* Time info */}
           <div className="text-center text-gray-600 mb-6">
             <p>Completed in {minutes}m {seconds}s</p>
             <p className="text-sm">
@@ -152,16 +134,11 @@ const Results: React.FC = () => {
             </p>
           </div>
 
-          {/* Toggle Details Button */}
-          <Button 
-            onClick={() => setShowDetails(!showDetails)} 
-            className="w-full mb-4"
-          >
+          <Button onClick={() => setShowDetails(!showDetails)} className="w-full mb-4">
             {showDetails ? '▲ Hide Detailed Review' : '▼ Show Detailed Review'}
           </Button>
         </div>
 
-        {/* Detailed Review */}
         {showDetails && (
           <div className="space-y-4 mb-6">
             <h3 className="text-2xl font-bold text-accent mb-4">Question Review</h3>
@@ -177,9 +154,7 @@ const Results: React.FC = () => {
                     Question {index + 1}: {question.text}
                   </h4>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                    question.isCorrect 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
+                    question.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {question.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                   </span>
@@ -208,16 +183,10 @@ const Results: React.FC = () => {
                           <span className="text-accent">{option.text}</span>
                           <div className="flex items-center space-x-2">
                             {option.selected && (
-                              <span className="text-sm font-semibold text-blue-600">
-                                Your answer
-                              </span>
+                              <span className="text-sm font-semibold text-blue-600">Your answer</span>
                             )}
-                            {option.isCorrect && (
-                              <span className="text-green-600 font-bold">✓</span>
-                            )}
-                            {!option.isCorrect && option.selected && (
-                              <span className="text-red-600 font-bold">✗</span>
-                            )}
+                            {option.isCorrect && <span className="text-green-600 font-bold">✓</span>}
+                            {!option.isCorrect && option.selected && <span className="text-red-600 font-bold">✗</span>}
                           </div>
                         </div>
                       </div>
@@ -225,9 +194,7 @@ const Results: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className={`p-3 rounded-lg ${
-                      question.isCorrect ? 'bg-green-50' : 'bg-red-50'
-                    }`}>
+                    <div className={`p-3 rounded-lg ${question.isCorrect ? 'bg-green-50' : 'bg-red-50'}`}>
                       <p className="text-sm text-gray-600">Your answer:</p>
                       <p className="text-accent font-semibold">
                         {question.userAnswer || '(No answer provided)'}
@@ -236,9 +203,7 @@ const Results: React.FC = () => {
                     {!question.isCorrect && question.correctAnswer && (
                       <div className="p-3 rounded-lg bg-green-50">
                         <p className="text-sm text-gray-600">Correct answer:</p>
-                        <p className="text-green-700 font-semibold">
-                          {question.correctAnswer}
-                        </p>
+                        <p className="text-green-700 font-semibold">{question.correctAnswer}</p>
                       </div>
                     )}
                   </div>
@@ -248,7 +213,6 @@ const Results: React.FC = () => {
           </div>
         )}
 
-        {/* Action Buttons */}
         <div className="flex gap-4 justify-center">
           <Button onClick={() => navigate('/')} className="px-8">
             Back to Quizzes

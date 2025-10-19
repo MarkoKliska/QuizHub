@@ -1,4 +1,3 @@
-// src/App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './guards/ProtectedRoute';
@@ -38,7 +37,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* IZMENJENO: Dodaj :attemptId parametar */}
               <Route
                 path="/results/:attemptId"
                 element={
@@ -47,7 +45,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* NOVO: Dodaj rutu za sve rezultate */}
               <Route
                 path="/my-results"
                 element={

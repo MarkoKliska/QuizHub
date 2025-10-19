@@ -7,6 +7,7 @@ namespace QuizHub.Application.Features.QuizAttempt.GetQuizAttemptDetails;
 
 public sealed class GetQuizAttemptDetailsQueryHandler(
     IQuizAttemptRepository quizAttemptRepository,
+    IQuizAttemptAnswerRepository quizAttemptAnswerRepository,
     IQuestionRepository questionRepository,
     IOptionRepository optionRepository
 ) : IRequestHandler<GetQuizAttemptDetailsQuery, Result<QuizAttemptDetailsDto>>
@@ -19,27 +20,54 @@ public sealed class GetQuizAttemptDetailsQueryHandler(
 
         var quiz = attempt.Quiz;
         var questions = await questionRepository.GetByQuizIdAsync(quiz.Id, ct);
+        var userAnswers = await quizAttemptAnswerRepository.GetByQuizAttemptIdAsync(attempt.Id, ct);
 
         var questionDtos = new List<QuestionDetailDto>();
 
         foreach (var question in questions)
         {
+            var userAnswer = userAnswers.FirstOrDefault(a => a.QuestionId == question.Id);
             var options = await optionRepository.GetByQuestionIdAsync(question.Id, ct);
 
+            List<OptionDetailDto> optionDtos = new();
+            string? userTextAnswer = null;
 
-            var optionDtos = options.Select(o => new OptionDetailDto
+            if (question.Type == Domain.Entities.QuestionType.SingleChoice ||
+                question.Type == Domain.Entities.QuestionType.MultipleChoice)
             {
-                Text = o.Text,
-                IsCorrect = o.IsCorrect,
-                Selected = false
-            }).ToList();
+                var selectedIds = userAnswer?.SelectedOptionIds ?? new List<Guid>();
+
+                optionDtos = options.Select(o => new OptionDetailDto
+                {
+                    Text = o.Text,
+                    IsCorrect = o.IsCorrect,
+                    Selected = selectedIds.Contains(o.Id)
+                }).ToList();
+            }
+            else if (question.Type == Domain.Entities.QuestionType.TrueFalse && options.Any())
+            {
+                var selectedIds = userAnswer?.SelectedOptionIds ?? new List<Guid>();
+
+                optionDtos = options.Select(o => new OptionDetailDto
+                {
+                    Text = o.Text,
+                    IsCorrect = o.IsCorrect,
+                    Selected = selectedIds.Contains(o.Id)
+                }).ToList();
+            }
+            else
+            {
+                userTextAnswer = userAnswer?.TextAnswer;
+            }
 
             questionDtos.Add(new QuestionDetailDto
             {
                 Text = question.Text,
                 Type = question.Type.ToString(),
                 Options = optionDtos,
-                IsCorrect = false 
+                IsCorrect = userAnswer?.IsCorrect ?? false,
+                UserAnswer = userTextAnswer,
+                CorrectAnswer = question.CorrectAnswer
             });
         }
 
