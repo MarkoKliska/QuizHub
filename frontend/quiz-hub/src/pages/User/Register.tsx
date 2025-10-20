@@ -1,4 +1,3 @@
-// src/pages/User/Register.tsx
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';

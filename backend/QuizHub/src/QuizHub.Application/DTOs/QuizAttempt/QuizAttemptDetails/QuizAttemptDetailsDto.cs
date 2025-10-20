@@ -17,6 +17,8 @@ public class QuestionDetailDto
     public string Type { get; set; } = string.Empty;
     public List<OptionDetailDto> Options { get; set; } = [];
     public bool IsCorrect { get; set; }
+    public string? UserAnswer { get; internal set; }
+    public string? CorrectAnswer { get; internal set; }
 }
 
 public class OptionDetailDto

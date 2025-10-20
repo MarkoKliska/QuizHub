@@ -30,4 +30,14 @@ public class QuizAttempt
         EndTime = DateTime.UtcNow;
         IsCompleted = true;
     }
+
+    public void SetIsCompleted()
+    {
+        IsCompleted = true;
+    }
+
+    public void SetEndTime()
+    {
+        EndTime = DateTime.UtcNow;
+    }
 }

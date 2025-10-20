@@ -1,4 +1,3 @@
-// src/guards/GuestRoute.tsx (no-auth guard, za login/register da ne idu ako su ulogovani)
 import { JSX, useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';

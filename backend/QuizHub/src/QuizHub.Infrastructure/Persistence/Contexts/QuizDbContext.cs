@@ -13,6 +13,7 @@ public class QuizHubDbContext : DbContext
     public DbSet<Question>? Questions { get; set; }
     public DbSet<Option>? Options { get; set; }
     public DbSet<QuizAttempt>? QuizAttempts { get; set; }
+    public DbSet<QuizAttemptAnswer>? QuizAttemptAnswers { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("QuizHub");
