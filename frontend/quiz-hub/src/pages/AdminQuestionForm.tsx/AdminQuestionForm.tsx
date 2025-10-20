@@ -75,8 +75,6 @@ const AdminQuestionForm: React.FC = () => {
         options: [
           { text: '', isCorrect: false },
           { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
         ],
         correctAnswer: '',
       }));
@@ -123,10 +121,17 @@ const AdminQuestionForm: React.FC = () => {
   };
 
   const handleRemoveOption = (index: number) => {
+    const minOptions = formData.type === 'MultipleChoice' ? 4 : 2;
+    if (formData.options.length <= minOptions) {
+      setError(`Minimum ${minOptions} options required for ${formData.type === 'MultipleChoice' ? 'Multiple Choice' : 'this question type'}`);
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       options: prev.options.filter((_, i) => i !== index),
     }));
+    setError('');
   };
 
   const handleOptionTextChange = (index: number, text: string) => {
@@ -138,21 +143,21 @@ const AdminQuestionForm: React.FC = () => {
     }));
   };
 
-  const handleOptionCorrectChange = (index: number, isCorrect: boolean) => {
+  const handleOptionCorrectChange = (index: number) => {
     if (formData.type === 'SingleChoice' || formData.type === 'TrueFalse') {
-      // For single choice, only one option can be correct
+      // For single choice and true/false, only one option can be correct
       setFormData(prev => ({
         ...prev,
         options: prev.options.map((opt, i) =>
-          i === index ? { ...opt, isCorrect } : { ...opt, isCorrect: false }
+          i === index ? { ...opt, isCorrect: true } : { ...opt, isCorrect: false }
         ),
       }));
     } else {
-      // For multiple choice, multiple options can be correct
+      // For multiple choice, toggle the checkbox
       setFormData(prev => ({
         ...prev,
         options: prev.options.map((opt, i) =>
-          i === index ? { ...opt, isCorrect } : opt
+          i === index ? { ...opt, isCorrect: !opt.isCorrect } : opt
         ),
       }));
     }
@@ -174,9 +179,16 @@ const AdminQuestionForm: React.FC = () => {
         setError('Correct answer is required for Fill in the Blank questions');
         return false;
       }
-    } else if (formData.type === 'SingleChoice' || formData.type === 'MultipleChoice' || formData.type === 'TrueFalse') {
-      if (formData.options.length < 2) {
-        setError('At least 2 options are required');
+    } else if (formData.type === 'TrueFalse') {
+      // Za TrueFalse proveravamo da li je neka opcija selektovana
+      if (!formData.options.some(opt => opt.isCorrect)) {
+        setError('Please select True or False as the correct answer');
+        return false;
+      }
+    } else if (formData.type === 'SingleChoice' || formData.type === 'MultipleChoice') {
+      const minOptions = formData.type === 'MultipleChoice' ? 4 : 2;
+      if (formData.options.length < minOptions) {
+        setError(`At least ${minOptions} options are required for ${formData.type === 'MultipleChoice' ? 'Multiple Choice' : 'this question type'}`);
         return false;
       }
 
@@ -207,9 +219,28 @@ const AdminQuestionForm: React.FC = () => {
     try {
       const submitData: CreateQuestionDto = {
         ...formData,
-        options: (formData.type === 'FillInBlank') ? [] : formData.options,
-        correctAnswer: (formData.type === 'FillInBlank') ? formData.correctAnswer : undefined,
+        quizId: quizId || '',
       };
+
+      // Za FillInBlank koristimo correctAnswer i prazan options niz
+      if (formData.type === 'FillInBlank') {
+        submitData.options = [];
+        submitData.correctAnswer = formData.correctAnswer;
+      } 
+      // Za TrueFalse koristimo correctAnswer (True ili False kao string)
+      else if (formData.type === 'TrueFalse') {
+        submitData.options = [];
+        // Uzmi tekst opcije koja je označena kao tačna (True ili False)
+        const correctOption = formData.options.find(opt => opt.isCorrect);
+        submitData.correctAnswer = correctOption?.text || '';
+      }
+      // Za SingleChoice i MultipleChoice koristimo options
+      else {
+        submitData.options = formData.options;
+        submitData.correctAnswer = undefined;
+      }
+
+      console.log('Submitting question data:', submitData);
 
       if (isEditMode && questionId) {
         await adminService.updateQuestion(questionId, submitData);
@@ -219,7 +250,8 @@ const AdminQuestionForm: React.FC = () => {
       
       navigate(`/admin/quizzes/${quizId}/questions`);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Operation failed');
+      console.error('Error submitting question:', err);
+      setError(err.response?.data?.error || err.message || 'Operation failed');
     } finally {
       setLoading(false);
     }
@@ -336,10 +368,10 @@ const AdminQuestionForm: React.FC = () => {
                         <div className="flex items-center pt-3">
                           <input
                             type={formData.type === 'MultipleChoice' ? 'checkbox' : 'radio'}
+                            name="correct-answer"
                             checked={option.isCorrect}
-                            onChange={(e) => handleOptionCorrectChange(index, e.target.checked)}
-                            className="w-5 h-5 text-secondary focus:ring-secondary"
-                            disabled={formData.type === 'TrueFalse'}
+                            onChange={() => handleOptionCorrectChange(index)}
+                            className="w-5 h-5 text-secondary focus:ring-secondary cursor-pointer"
                           />
                         </div>
                         <div className="flex-1">
@@ -353,7 +385,7 @@ const AdminQuestionForm: React.FC = () => {
                             disabled={formData.type === 'TrueFalse'}
                           />
                         </div>
-                        {formData.type !== 'TrueFalse' && formData.options.length > 2 && (
+                        {formData.type !== 'TrueFalse' && formData.options.length > (formData.type === 'MultipleChoice' ? 4 : 2) && (
                           <Button
                             type="button"
                             onClick={() => handleRemoveOption(index)}
@@ -395,12 +427,20 @@ const AdminQuestionForm: React.FC = () => {
         </div>
 
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2"> Tips:</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">💡 Tips:</h3>
           <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-            <li><strong>Single Choice:</strong> Only one correct answer allowed</li>
-            <li><strong>Multiple Choice:</strong> Multiple correct answers allowed</li>
-            <li><strong>True/False:</strong> Simple binary choice question</li>
-            <li><strong>Fill in the Blank:</strong> Text-based answer (case-insensitive matching)</li>
+            <li>
+              <strong>Single Choice:</strong> Only one correct answer allowed (min. 2 options)
+            </li>
+            <li>
+              <strong>Multiple Choice:</strong> Multiple correct answers allowed (min. 4 options)
+            </li>
+            <li>
+              <strong>True/False:</strong> Simple binary choice question
+            </li>
+            <li>
+              <strong>Fill in the Blank:</strong> Text-based answer (case-insensitive matching)
+            </li>
           </ul>
         </div>
       </div>
