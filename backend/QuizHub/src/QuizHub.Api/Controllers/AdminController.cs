@@ -19,6 +19,7 @@ using QuizHub.Application.Features.Quiz.DeleteQuiz;
 using QuizHub.Application.Features.Quiz.GetAllQuizzes;
 using QuizHub.Application.Features.Quiz.GetQuizById;
 using QuizHub.Application.Features.Quiz.UpdateQuiz;
+using QuizHub.Application.Features.QuizAttempt.GetQuizAttempt;
 using System.Security.Claims;
 
 namespace QuizHub.Api.Controllers;
@@ -134,5 +135,12 @@ public class QuizAdminController(
     {
         var result = await mediator.Send(new DeleteQuestionCommand(id), ct);
         return result.IsSuccess ? NoContent() : NotFound(new { error = result.Error });
+    }
+
+    [HttpGet("attempts")]
+    public async Task<IActionResult> GetAllQuizAttempts(CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllQuizAttemptsQuery(), ct);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 }

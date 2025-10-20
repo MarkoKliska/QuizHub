@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthContext';
 import { Quiz } from '../../models/Quiz';
 import { Category } from '../../models/Category';
 import Input from '../../components/common/Input';
@@ -15,6 +16,13 @@ const Home: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
+  
+  if (!authContext) {
+    throw new Error('Home must be used within AuthProvider');
+  }
+  
+  const { user } = authContext;
 
   const difficulties = ['All', 'Easy', 'Medium', 'Hard'];
 
@@ -57,18 +65,28 @@ const Home: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-accent">Available Quizzes</h2>
         <div className="flex gap-3">
+          {user?.role === 'Admin' && (
+            <Button 
+              onClick={() => navigate('/admin')}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Admin Panel
+            </Button>
+          )}
           <Button 
             onClick={() => navigate('/leaderboard')}
             className="bg-yellow-600 hover:bg-yellow-700"
           >
-             Leaderboard
+            Leaderboard
           </Button>
-          <Button 
-            onClick={() => navigate('/my-results')}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            My Results
-          </Button>
+          {user?.role !== 'Admin' && (
+            <Button 
+              onClick={() => navigate('/my-results')}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              My Results
+            </Button>
+          )}
         </div>
       </div>
 
@@ -104,7 +122,6 @@ const Home: React.FC = () => {
           placeholder="Search quizzes..."
           className="w-full sm:w-64"
         />
-        <Button onClick={fetchQuizzes}>Apply Filters</Button>
       </div>
 
       {quizzes.length === 0 ? (
@@ -119,9 +136,11 @@ const Home: React.FC = () => {
               <p className="text-accent">Difficulty: {quiz.difficulty}</p>
               <p className="text-accent">Time Limit: {quiz.timeLimit} minutes</p>
               <p className="text-accent">Questions: {quiz.numberOfQuestions}</p>
-              <Button className="mt-4 w-full" onClick={() => navigate(`/quiz/${quiz.id}`)}>
-                Start Quiz
-              </Button>
+              {user?.role !== 'Admin' && (
+                <Button className="mt-4 w-full" onClick={() => navigate(`/quiz/${quiz.id}`)}>
+                  Start Quiz
+                </Button>
+              )}
             </div>
           ))}
         </div>

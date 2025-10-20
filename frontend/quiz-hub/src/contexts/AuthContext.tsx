@@ -4,11 +4,16 @@ import { User } from '../models/User';
 import { getToken, setToken, removeToken } from '../utils/tokenStorage';
 
 interface DecodedToken {
-  id: number;
+  sub?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'?: string;
+  id?: number;
   username?: string;
   userName?: string;
-  email: string;
-  role: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'?: string;
+  email?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'?: string;
+  role?: string;
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string;
 }
 
 interface AuthContextType {
@@ -28,12 +33,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = getToken();
     if (token) {
       try {
-        const decoded: DecodedToken = jwtDecode(token); 
+        const decoded: DecodedToken = jwtDecode(token);
+        
+        // Ekstraktuj role iz različitih mogućih claim names
+        const role = decoded.role || 
+                     decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 
+                     'User';
+        
+        // Ekstraktuj username iz različitih mogućih claim names
+        const username = decoded.username || 
+                        decoded.userName || 
+                        decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+                        '';
+        
+        // Ekstraktuj email iz različitih mogućih claim names
+        const email = decoded.email ||
+                     decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+                     '';
+        
+        // Ekstraktuj ID iz različitih mogućih claim names
+        const userId = decoded.id || 
+                      (decoded.sub ? parseInt(decoded.sub) : undefined) ||
+                      (decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] 
+                        ? parseInt(decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) 
+                        : 0);
+        
+        console.log('Decoded token:', { username, email, role, userId }); // Debug log
+        
         setUser({
-          id: decoded.id,
-          username: decoded.username || decoded.userName || '', 
-          email: decoded.email,
-          role: decoded.role,
+          id: userId,
+          username: username,
+          email: email,
+          role: role,
         });
         setIsAuthenticated(true);
       } catch (error) {
